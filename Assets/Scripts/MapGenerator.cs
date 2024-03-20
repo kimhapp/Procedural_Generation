@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class MapGenerator : MonoBehaviour
 {
-    public enum DrawMode{NoiseMap, ColorMap, Mesh, FallOffMap};
+    public enum DrawMode{NoiseMap, Mesh, FallOffMap};
     public DrawMode drawMode;
 
     public TerrainData terrainData;
@@ -118,6 +118,8 @@ public class MapGenerator : MonoBehaviour
                 }
             }
         }
+
+        textureData.UpdateMeshHeights(terrainMaterial, terrainData.minHeight, terrainData.maxHeight);
 
         return new MapData(noiseMap);
     }
