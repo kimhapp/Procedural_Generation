@@ -15,5 +15,4 @@ public class UpdatableDataEditor : Editor {
 			EditorUtility.SetDirty (target);
 		}
 	}
-	
 }
