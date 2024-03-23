@@ -8,18 +8,13 @@ public class MapGenerator : MonoBehaviour {
 	public enum DrawMode {NoiseMap, Mesh, FalloffMap};
 	public DrawMode drawMode;
 
-	public TerrainData terrainData;
-	public NoiseData noiseData;
+	public MeshSettings meshSettings;
+	public HeightMapSettings heightMapSettings;
 	public TextureData textureData;
 
 	public Material terrainMaterial;
 
-	[Range(0, MeshGenerator.numSupportedChunkSizes - 1)]
-	public int chunkSizeIndex;
-	[Range(0, MeshGenerator.numSupportedFlatShadedChunkSizes - 1)]
-	public int flatshadedChunkSizeIndex;
-
-	[Range(0, MeshGenerator.numSupportedLODs - 1)]
+	[Range(0, MeshSettings.numSupportedLODs - 1)]
 	public int editorPreviewLOD;
 
 	public bool autoUpdate;
@@ -29,46 +24,33 @@ public class MapGenerator : MonoBehaviour {
 	Queue<MapThreadInfo<HeightMap>> heightMapThreadInfoQueue = new Queue<MapThreadInfo<HeightMap>>();
 	Queue<MapThreadInfo<MeshData>> meshDataThreadInfoQueue = new Queue<MapThreadInfo<MeshData>>();
 
-	void Awake() {
+	void Start() {
 		textureData.ApplyToMaterial(terrainMaterial);
-		textureData.UpdateMeshHeights (terrainMaterial, terrainData.minHeight, terrainData.maxHeight);
+		textureData.UpdateMeshHeights(terrainMaterial, heightMapSettings.minHeight, heightMapSettings.maxHeight);
 	}
 
 	void OnValuesUpdated() {
 		if (!Application.isPlaying) {
-			DrawMapInEditor ();
+			DrawMapInEditor();
 		}
 	}
 
 	void OnTextureValuesUpdated() {
-		textureData.ApplyToMaterial (terrainMaterial);
-	}
-
-	public int mapChunkSize {
-		get {
-
-
-			if (terrainData.useFlatShading) {
-				return MeshGenerator.supportedFlatShadedChunkSizes[flatshadedChunkSizeIndex] - 1;
-			} else {
-				return MeshGenerator.supportedChunkSizes[chunkSizeIndex] - 1;
-			}
-		}
+		textureData.ApplyToMaterial(terrainMaterial);
 	}
 
 	public void DrawMapInEditor() {
-		textureData.UpdateMeshHeights (terrainMaterial, terrainData.minHeight, terrainData.maxHeight);
-		HeightMap heightMap = GenerateHeightMap (Vector2.zero);
+		textureData.UpdateMeshHeights (terrainMaterial, heightMapSettings.minHeight, heightMapSettings.maxHeight);
+		HeightMap heightMap = HeightMapGenerator.GenerateHeightMap(meshSettings.numVertsPerLine, meshSettings.numVertsPerLine, heightMapSettings, Vector2.zero);
 
-		MapDisplay display = FindAnyObjectByType<MapDisplay> ();
+		MapDisplay display = FindAnyObjectByType<MapDisplay>();
 		if (drawMode == DrawMode.NoiseMap) {
-			display.DrawTexture (TextureGenerator.TextureFromHeightMap (heightMap.heightMap));
+			display.DrawTexture (TextureGenerator.TextureFromHeightMap(heightMap.values));
 		} else if (drawMode == DrawMode.Mesh) {
-			display.DrawMesh (MeshGenerator.GenerateTerrainMesh (heightMap.heightMap, terrainData.meshHeightMultiplier, terrainData.meshHeightCurve, editorPreviewLOD,terrainData.useFlatShading));
+			display.DrawMesh (MeshGenerator.GenerateTerrainMesh(heightMap.values, meshSettings, editorPreviewLOD));
 		} else if (drawMode == DrawMode.FalloffMap) {
-			display.DrawTexture(TextureGenerator.TextureFromHeightMap(FalloffGenerator.GenerateFalloffMap(mapChunkSize)));
+			display.DrawTexture(TextureGenerator.TextureFromHeightMap(FalloffGenerator.GenerateFalloffMap(meshSettings.numVertsPerLine)));
 		}
-		textureData.UpdateMeshHeights (terrainMaterial, terrainData.minHeight, terrainData.maxHeight);
 	}
 
 	public void RequestHeightMap(Vector2 centre, Action<HeightMap> callback) {
@@ -80,7 +62,7 @@ public class MapGenerator : MonoBehaviour {
 	}
 
 	void HeightMapThread(Vector2 centre, Action<HeightMap> callback) {
-		HeightMap heightMap = GenerateHeightMap (centre);
+		HeightMap heightMap = HeightMapGenerator.GenerateHeightMap(meshSettings.numVertsPerLine, meshSettings.numVertsPerLine, heightMapSettings, centre);
 		lock (heightMapThreadInfoQueue) {
 			heightMapThreadInfoQueue.Enqueue (new MapThreadInfo<HeightMap> (callback, heightMap));
 		}
@@ -95,7 +77,7 @@ public class MapGenerator : MonoBehaviour {
 	}
 
 	void MeshDataThread(HeightMap heightMap, int lod, Action<MeshData> callback) {
-		MeshData meshData = MeshGenerator.GenerateTerrainMesh (heightMap.heightMap, terrainData.meshHeightMultiplier, terrainData.meshHeightCurve, lod,terrainData.useFlatShading);
+		MeshData meshData = MeshGenerator.GenerateTerrainMesh(heightMap.values, meshSettings, lod);
 		lock (meshDataThreadInfoQueue) {
 			meshDataThreadInfoQueue.Enqueue (new MapThreadInfo<MeshData> (callback, meshData));
 		}
@@ -117,38 +99,15 @@ public class MapGenerator : MonoBehaviour {
 		}
 	}
 
-	HeightMap GenerateHeightMap(Vector2 centre) {
-		float[,] noiseMap = Noise.GenerateNoiseMap (mapChunkSize + 2, mapChunkSize + 2, noiseData.seed, noiseData.noiseScale, noiseData.octaves, noiseData.persistance, noiseData.lacunarity, centre + noiseData.offset, noiseData.normalizeMode);
-
-		if (terrainData.useFalloff) {
-
-			if (falloffMap == null) {
-				falloffMap = FalloffGenerator.GenerateFalloffMap (mapChunkSize + 2);
-			}
-			 
-			for (int y = 0; y < mapChunkSize+2; y++) {
-				for (int x = 0; x < mapChunkSize+2; x++) {
-					if (terrainData.useFalloff) {
-						noiseMap [x, y] = Mathf.Clamp01 (noiseMap [x, y] - falloffMap [x, y]);
-					}
-				
-				}
-			}
-
-		}
-
-		return new HeightMap (noiseMap);
-	}
-
 	void OnValidate() {
 
-		if (terrainData != null) {
-			terrainData.OnValuesUpdated -= OnValuesUpdated;
-			terrainData.OnValuesUpdated += OnValuesUpdated;
+		if (meshSettings != null) {
+			meshSettings.OnValuesUpdated -= OnValuesUpdated;
+			meshSettings.OnValuesUpdated += OnValuesUpdated;
 		}
-		if (noiseData != null) {
-			noiseData.OnValuesUpdated -= OnValuesUpdated;
-			noiseData.OnValuesUpdated += OnValuesUpdated;
+		if (heightMapSettings != null) {
+			heightMapSettings.OnValuesUpdated -= OnValuesUpdated;
+			heightMapSettings.OnValuesUpdated += OnValuesUpdated;
 		}
 		if (textureData != null) {
 			textureData.OnValuesUpdated -= OnTextureValuesUpdated;
@@ -166,7 +125,5 @@ public class MapGenerator : MonoBehaviour {
 			this.callback = callback;
 			this.parameter = parameter;
 		}
-
 	}
-
 }
