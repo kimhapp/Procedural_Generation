@@ -12,7 +12,6 @@ public class TerrainGenerator : MonoBehaviour {
 
 	public MeshSettings meshSettings;
 	public HeightMapSettings heightMapSettings;
-	public TextureData textureSettings;
 
 	public Transform viewer;
 	public Material mapMaterial;
@@ -26,9 +25,6 @@ public class TerrainGenerator : MonoBehaviour {
 	List<TerrainChunk> visibleTerrainChunks = new List<TerrainChunk>();
 
 	void Start() {
-		textureSettings.ApplyToMaterial(mapMaterial);
-		textureSettings.UpdateMeshHeights(mapMaterial, heightMapSettings.minHeight, heightMapSettings.maxHeight);
-
 		float maxViewDst = detailLevels [detailLevels.Length - 1].visibleDstThreshold;
 		chunkSize = meshSettings.meshWorldSize;
 		chunksVisibleInViewDst = Mathf.RoundToInt(maxViewDst / chunkSize);

@@ -12,7 +12,7 @@ public static class Noise {
 
 		float maxPossibleHeight = 0;
 		float amplitude = 1;
-		float frequency = 1;
+		float frequency;
 
 		for (int i = 0; i < settings.octaves; i++) {
 			float offsetX = prng.Next (-100000, 100000) + settings.offset.x + sampleCentre.x;

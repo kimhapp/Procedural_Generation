@@ -1,5 +1,4 @@
 ﻿﻿using UnityEngine;
-using System.Collections;
 
 public static class MeshGenerator {
 
@@ -58,7 +57,7 @@ public static class MeshGenerator {
 						height = heightMainVertexA * (1 - distancePercentFromAToB) + heightMainVertexB * distancePercentFromAToB;
 					}
 
-					meshData.AddVertex (new Vector3(vertexPosition2D.x, height, vertexPosition2D.y), percent, vertexIndex);
+					meshData.AddVertex (new Vector3(vertexPosition2D.x, height, vertexPosition2D.y), vertexIndex);
 
 					bool createTriangle = x < numVertsPerLine - 1 && y < numVertsPerLine - 1 && (!isEdgeConnectionVertex || (x != 2 && y != 2));
 
@@ -116,12 +115,12 @@ public class MeshData {
 		outOfMeshTriangles = new int[24 * (numVertsPerLine-2)];
 	}
 
-	public void AddVertex(Vector3 vertexPosition, Vector2 uv, int vertexIndex) {
+	public void AddVertex(Vector3 vertexPosition, int vertexIndex) {
 		if (vertexIndex < 0) {
 			outOfMeshVertices [-vertexIndex - 1] = vertexPosition;
 		} else {
 			vertices [vertexIndex] = vertexPosition;
-			uvs [vertexIndex] = uv;
+			uvs [vertexIndex] = new Vector2(0, vertexPosition.y);
 		}
 	}
 
