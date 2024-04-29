@@ -62,7 +62,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Grass_Texture:
-        m_Texture: {fileID: 2800000, guid: bbfb77877dc8c7b44beb0ce1a24dfd49, type: 3}
+        m_Texture: {fileID: 2800000, guid: 72c633406d1c7054fa3b2f660a10aca6, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -82,11 +82,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Rock_Texture:
-        m_Texture: {fileID: 2800000, guid: 6ac142b5ad12f594981e6d112bad837d, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6eb871c0114d4b742a76b1128ece4bcd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Sand_Texture:
-        m_Texture: {fileID: 2800000, guid: ca076ce0c5235994697dfcca573288dd, type: 3}
+        m_Texture: {fileID: 2800000, guid: 82290c1f42b4dc34088323a01ceaffec, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
@@ -94,11 +94,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Stone_Texture:
-        m_Texture: {fileID: 2800000, guid: cf80f881be46d4642bc0e5b1618e817d, type: 3}
+        m_Texture: {fileID: 2800000, guid: c3c5070431c6ea247a6b009873fe078c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Stony_Ground_Texture:
-        m_Texture: {fileID: 2800000, guid: 6f02a6c29450eca49ab4182d82509e6f, type: 3}
+        m_Texture: {fileID: 2800000, guid: f6018222a4f1c1e4d9ddf12d5748a01d, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -132,7 +132,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _Grass_Height: 2
+    - _Grass_Height: 1.2
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -146,7 +146,7 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
-    - _Stone_Height: 20
+    - _Stone_Height: 10
     - _Stony_Ground_Height: 5
     - _Surface: 0
     - _WorkflowMode: 1
